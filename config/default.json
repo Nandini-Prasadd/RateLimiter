@@ -1,0 +1,39 @@
+{
+  "storage": {
+    "mode": "memory",
+    "redis_host": "127.0.0.1",
+    "redis_port": 6379,
+    "redis_timeout_ms": 200
+  },
+  "plans": {
+    "free": {
+      "refill_rate": 20.0,
+      "capacity": 40.0,
+      "priority": "low"
+    },
+    "pro": {
+      "refill_rate": 100.0,
+      "capacity": 200.0,
+      "priority": "medium"
+    },
+    "premium": {
+      "refill_rate": 300.0,
+      "capacity": 600.0,
+      "priority": "high"
+    }
+  },
+  "adaptive": {
+    "target_p95_latency_ms": 120.0,
+    "max_error_rate": 0.05,
+    "min_multiplier": 0.25,
+    "max_multiplier": 1.50,
+    "decrease_step": 0.15,
+    "increase_step": 0.05,
+    "cooldown_ms": 3000
+  },
+  "server": {
+    "proxy_port": 8080,
+    "backend_port": 8081,
+    "backend_host": "127.0.0.1"
+  }
+}
