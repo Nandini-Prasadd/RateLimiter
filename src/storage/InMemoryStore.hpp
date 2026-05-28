@@ -1,36 +1,49 @@
 #pragma once
-
-#include "storage/IRateLimitStore.hpp"
 #include <unordered_map>
-#include <mutex>
-#include <vector>
 #include <string>
+#include <mutex>
+#include "../core/TokenBucket.hpp"
 
-namespace adaptive_rate_limiter {
-
-class InMemoryStore : public IRateLimitStore {
-public:
-    explicit InMemoryStore(size_t num_shards = 64);
-    ~InMemoryStore() override = default;
-
-    RateLimitDecision consume(const RateLimitRequest& request, const RuntimePolicy& policy) override;
-
-    // Helper for debugging/admin to inspect current tokens
-    double get_tokens(const std::string& identity, double capacity) const;
-
+class InMemoryStore {
 private:
-    struct Bucket {
-        double tokens;
-        std::chrono::steady_clock::time_point last_refill;
+    std::unordered_map<std::string, TokenBucket> buckets;
+    std::mutex mtx;
+
+    // 🔥 API key → (capacity, refill_rate)
+    std::unordered_map<std::string, std::pair<int, double>> config = {
+        {"userA", {5, 1}},       // free user
+        {"userB", {10, 2}},      // better user
+        {"premium", {20, 5}}     // premium user
     };
 
-    struct Shard {
-        std::unordered_map<std::string, Bucket> buckets;
-        mutable std::mutex mutex;
-    };
+public:
+    TokenBucket& getBucket(const std::string& user) {
+        std::lock_guard<std::mutex> lock(mtx);
 
-    std::vector<Shard> shards_;
-    size_t get_shard_index(const std::string& key) const;
+        auto it = buckets.find(user);
+        if (it != buckets.end()) {
+            return it->second;
+        }
+
+        // 🔥 Get config for user
+        int cap = 5;
+        double rate = 1;
+
+        auto cfg = config.find(user);
+        if (cfg != config.end()) {
+            cap = cfg->second.first;
+            rate = cfg->second.second;
+        }
+
+        auto result = buckets.emplace(user, TokenBucket(cap, rate));
+        return result.first->second;
+    }
+
+    int getLimit(const std::string& user) {
+        auto cfg = config.find(user);
+        if (cfg != config.end()) {
+            return cfg->second.first;
+        }
+        return 5;
+    }
 };
-
-} // namespace adaptive_rate_limiter
