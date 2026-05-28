@@ -8,7 +8,7 @@ Designed to simulate real-world backend infrastructure used in production system
 
 ---
 
-##Features
+## Features
 
 * **API Key-based Rate Limiting**
 * **High Throughput (~10k req/sec locally)**
@@ -21,7 +21,7 @@ Designed to simulate real-world backend infrastructure used in production system
 
 ---
 
-##Architecture
+## Architecture
 
 ```
 Client → C++ Server → Thread Pool → Redis (Lua Script)
