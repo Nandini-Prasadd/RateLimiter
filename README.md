@@ -136,7 +136,7 @@ curl -H "x-api-key: userA" http://localhost:8080
 
 ---
 
-##Tech Stack
+## Tech Stack
 
 * **C++ (Sockets, Threads)**
 * **Redis**
