@@ -9,7 +9,6 @@ private:
     std::unordered_map<std::string, TokenBucket> buckets;
     std::mutex mtx;
 
-    // 🔥 API key → (capacity, refill_rate)
     std::unordered_map<std::string, std::pair<int, double>> config = {
         {"userA", {5, 1}},       // free user
         {"userB", {10, 2}},      // better user
@@ -25,7 +24,6 @@ public:
             return it->second;
         }
 
-        // 🔥 Get config for user
         int cap = 5;
         double rate = 1;
 
